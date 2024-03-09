@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <meta charset="UTF-8">
+    <title>list winner</title>
+</head>
+<body>
+    <div class="container">
+        <h1>list winner </h1>
+
+        <form id="addWinnerForm">
+            <label for="idPlayer">Id Player </label>
+            <input type="text" class="form-control" id="idPlayer" required>
+
+            <label for="giftId">Id Game:</label>
+            <input type="text" class="form-control" id="giftId" required>
+
+            <label for="amount">amount:</label>
+            <input type="text" class="form-control" id="amount">
+
+            <label for="state">state:</label>
+            <input type="text" class="form-control" id="state">
+
+            <button type="button" class="btn btn-primary" onclick="addWinner()">add</button>
+        </form>
+
+      
+        <table class="table" id="winnersTable">
+            <thead>
+                <tr>
+                    <th>Id Win</th>
+                    <th>Id playr</th>
+                    <th>Id Game</th>
+                    <th>Id gift </th>
+                    <th> amout </th>
+                    <th>satte</th>
+                    <th>add</th>
+                </tr>
+            </thead>
+            <tbody id="winnersList"></tbody>
+        </table>
+    </div>
+
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>
