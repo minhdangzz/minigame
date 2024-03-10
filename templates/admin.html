@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="static/style.css">
    
     <title>Game and Prize Management</title>
@@ -9,28 +8,33 @@
 <body>
     <div class="container">
         <div class="sidebar">
-            <button class="btn btn-primary sidebar-btn" data-target="minigame-list">Mini Game List</button>
-            <button class="btn btn-primary sidebar-btn" data-target="prize-list">Prize List</button>
-            <button class="btn btn-primary sidebar-btn" onclick="window.location.href='/public-link-list'">Public Game Link</button>
-            <button class="btn btn-primary sidebar-btn" onclick="window.location.href='/winner-list'">Winner List</button>
+           
+            <button class="btn btn-primary sidebar-btn" onclick="window.location.href='/public-link-list'">List Game</button>
+            <button class="btn btn-primary sidebar-btn" onclick="window.location.href='/winner-list'">Gifts</button>
         </div>
     </div>
 
     <div class="container">
         <h1>-------------------------Admin Management---------------------</h1>
-        <h2>Public Game Link List</h2>
+        <h2>List Game</h2>
         <form method="POST" action="{{ url_for('public_link_list') }}">
             {{ form.hidden_tag() }}
             {{ form.csrf_token }}
-            <label for="link">Link:</label>
-            {{ form.link(class="form-control link-input") }}
-            <label for="gameId">Game Id:</label>
-            {{ form.gameId(class="form-control gameId-input") }}
-            <label for="poster">Poster:</label>
-            {{ form.poster(class="form-control poster-input") }}
-            <label for="description">Description:</label>
-            {{ form.description(class="form-control description-input") }}
-            <button type="submit" class="btn btn-primary add-link">Add Link</button>
+            <label for="link">Game Id</label>
+            {{ form.link(class="form-control gammeId-input") }}
+            <label for="gameId">Game Name</label>
+            {{ form.gameId(class="form-control gameNamme-input") }}
+            <label for="poster">Game Description</label>
+            {{ form.poster(class="form-control gameDescription-input") }}
+            <label for="description">Type</label>
+            {{ form.description(class="form-control type-input") }}
+            <label for="description">Rule</label>
+            {{ form.description(class="form-control rule-input") }}
+            <label for="description">Start Day</label>
+            {{ form.description(class="form-control sartDay-input") }}
+            <label for="description">Last Day</label>
+            {{ form.description(class="form-control lastDay-input") }}
+            <button type="submit" class="btn btn-primary add-link">Add Game</button>
         </form>
         <table class="table">
             <thead>
@@ -40,59 +44,50 @@
             <tbody class="links-list">
                 {% for link in links %}
                     <tr>
-                        <td>{{ link.Link }}</td>
                         <td>{{ link.GameId }}</td>
-                        <td>{{ link.Poster }}</td>
-                        <td>{{ link.Caption }}</td>
+                        <td>{{ link.GameName }}</td>
+                        <td>{{ link.GameDescription }}</td>
+                        <td>{{ link.Type }}</td>
+                        <td>{{ link.Rule }}</td>
+                        <td>{{ link.SartDay }}</td>
+                        <td>{{ link.LastDay }}</td>
                         <td>
-                            <button class="btn btn-warning edit-link">Edit</button>
-                            <button class="btn btn-danger delete-link">Delete</button>
+                            <button class="btn btn-warning edit-link" data-link-id="{{ link.GameId }}">Edit</button>
+                            <button class="btn btn-danger delete-link" data-link-id="{{ link.GameId }}">Delete</button>
+                            <button class="btn btn-primary share-link" data-link-id="{{ link.GameId }}">Share</button>
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <h2>Winners List</h2>
-        <form method="POST" action="{{ url_for('winner_list') }}">
-            {{ form.hidden_tag() }}
-            {{ form.csrf_token }}
-            <label for="idWin">Win Id:</label>
-            {{ form.idWin(class="form-control idWin-input") }}
-            <label for="idPlayer">Player Id:</label>
-            {{ form.idPlayer(class="form-control playerId-input") }}
-            <label for="giftId">Gift Id:</label>
-            {{ form.giftId(class="form-control giftId-input") }}
-            <label for="amount">Amount:</label>
-            {{ form.amount(class="form-control amount-input") }}
-            <label for="state">State:</label>
-            {{ form.state(class="form-control state-input") }}
-            <button type="submit" class="btn btn-primary add-winner">Add Winner</button>
-        </form>
-        <table class="table">
-            <thead>
-             
-            </thead>
-            <tbody class="winners-list">
-                {% for winner in winners %}
-                    <tr>
-                        <td>{{ winner.WinId }}</td>
-                        <td>{{ winner.IdPlayer }}</td>
-                        <td>{{ winner.GiftId }}</td>
-                        <td>{{ winner.Amount }}</td>
-                        <td>{{ winner.State }}</td>
-                        <td>
-                            <td>
-                                <button class="btn btn-warning edit-winner" data-winner-id="{{ winner.WinId }}">Edit</button>
-                                <button class="btn btn-danger delete-winner" data-winner-id="{{ winner.WinId }}">Delete</button>
-                            </td>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        
     </div>
-    
+    <script src="static/admin.js"></script>
+    <script src="static/public_link_game.js"></script>
+    <script src="static/winners.js"></script>
+    <script type="text/template" class="links-list-template">
+        <td><span class="link"><%= link %></span></td>
+        <td><span class="gameId"><%= gameId %></span></td>
+        <td><span class="poster"><%= poster %></span></td>
+        <td><span class="description"><%= description %></span></td>
+        <td>
+            <button class="btn btn-warning edit-link">Edit</button>
+            <button class="btn btn-danger delete-link">Delete</button>
+            <button class="btn btn-primary share-link">Share</button>
+            
         </td>
     </script>
+    <script type="text/template" class="winners-list-template">
+        <td><span class="WinId"><%= WinId %></span></td>
+        <td><span class="IdPlayer"><%= IdPlayer %></span></td>
+        <td><span class="GiftId"><%= GiftId %></span></td>
+        <td><span class="Amount"><%= Amount %></span></td>
+        <td><span class="State"><%= State %></span></td>
+        <td>
+            <button class="btn btn-warning edit-winner">Edit</button>
+            <button class="btn btn-danger delete-winner">Delete</button>
+        </td>
+    </script>
+    
 </body>
 </html>

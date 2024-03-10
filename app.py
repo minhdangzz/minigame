@@ -10,10 +10,13 @@ from werkzeug.security import generate_password_hash
 from flask import send_file
 from wtforms.validators import DataRequired
 from flask import Flask, request, jsonify
+from flask import jsonify
+from flask import Flask, render_template, url_for, send_from_directory
+from flask import request
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '12345'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345@localhost/db'
+app.config['SECRET_KEY'] = '260802'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:260802@localhost/db'
 db = SQLAlchemy(app)
 
 login_manager = LoginManager(app)
@@ -133,7 +136,7 @@ class RegistrationForm(FlaskForm):
     ])
     confirm_password = PasswordField('Confirm Password', validators=[validators.DataRequired()])
     submit = SubmitField('Register')
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/admin', methods=['POST', 'GET'])
 def login():
     form = LoginForm()
 
@@ -149,7 +152,7 @@ def login():
 
     return render_template('admin.html', form=form)
 def index():
-    return render_template('login.html')
+    return render_template('admin.html')
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -180,25 +183,52 @@ def admin():
     else:
         return redirect(url_for('login'))
     
-@app.route('/public_links', methods=['GET', 'POST'])
-def public_links():
+
+@app.route('/api/public_links', methods=['GET', 'POST'])
+def get_or_create_public_links():
     if request.method == 'GET':
-        
-        public_links = PublicLinks.query.all()
-        links_list = [{'LinkId': link.LinkId, 'Link': link.Link, 'GameId': link.GameId, 'GiftId': link.GiftId,
-                       'Poster': link.Poster, 'Caption': link.Caption} for link in public_links]
+        # Handle logic to retrieve and return all public links
         return jsonify({'public_links': links_list})
 
     elif request.method == 'POST':
-       
         data = request.json
-        new_link = PublicLinks(Link=data['Link'], GameId=data['GameId'], GiftId=data['GiftId'],
-                               Poster=data['Poster'], Caption=data['Caption'])
+        new_link = PublicLinks(Link=data['Link'], GameId=data['GameId'],
+                               Poster=data['Poster'], Caption=data['Caption'], Shared=False)
         db.session.add(new_link)
         db.session.commit()
         return jsonify({'message': 'Public link created successfully'}), 201
 
+@app.route('/api/public_links/<int:linkId>', methods=['PUT', 'DELETE'])
+def edit_or_delete_link(linkId):
+    if request.method == 'PUT':
+        data = request.json
+        updated_link = PublicLinks.query.get(linkId)
+        if updated_link:
+            updated_link.Link = data['Link']
+            updated_link.GameId = data['GameId']
+            updated_link.Poster = data['Poster']
+            updated_link.Caption = data['Caption']
+            db.session.commit()
+            return jsonify({'message': 'Public link updated successfully'}), 200
+        else:
+            return jsonify({'error': 'Link not found'}), 404
 
+    elif request.method == 'DELETE':
+        link_to_delete = PublicLinks.query.get(linkId)
+        if link_to_delete:
+            db.session.delete(link_to_delete)
+            db.session.commit()
+            return jsonify({'message': 'Public link deleted successfully'}), 200
+        else:
+            return jsonify({'error': 'Link not found'}), 404
+
+@app.route('/api/public_links/share/<int:linkId>', methods=['POST'])
+def share_link(linkId):
+    # Handle the logic for sharing the link with linkId
+    # You can use request.json to get any additional data from the frontend
+
+    return jsonify({'message': 'Link shared successfully'}), 200
+        
 @app.route('/winners', methods=['GET', 'POST'])
 def winners():
     if request.method == 'GET':
@@ -236,7 +266,8 @@ def public_link_list():
 
 @app.route('/winner-list')
 def winner_list():
-    return render_template('winner-list.html')   
+    form = WinnerForm()  # Create an instance of your form
+    return render_template('listgift.html', form=form)
 @app.route('/input_form', methods=['GET'])
 def render_input_form():
     form = InputForm()
@@ -259,8 +290,15 @@ def input_data():
 def add_link():
     data = request.json
     return jsonify({'message': 'Link added successfully'}), 201
+@app.route('/copy_link/<int:link_id>', methods=['POST'])
+def copy_link(link_id):
+    link = PublicLinks.query.get(link_id)
+
+    if link:
+        return jsonify({'message': 'Link copied successfully', 'link_text': link.Link}), 200
+    else:
+        return jsonify({'message': 'Link not found'}), 404
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
-

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Game and Prize Management</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="sidebar">
+          
+            <button class="btn btn-primary sidebar-btn" onclick="window.location.href='/public-link-list'">Public Game Link</button>
+            <button class="btn btn-primary sidebar-btn" onclick="window.location.href='/winner-list'">Gifts</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>-------------------------Admin Management---------------------</h1>
+
+        <h2>GiftS</h2>
+        <form method="POST" action="{{ url_for('winner_list') }}">
+            {{ form.hidden_tag() }}
+            {{ form.csrf_token }}
+
+            <label for="idWin">Gift ID:</label>
+            {{ form.idWin(class="form-control idWin-input") }}
+
+            <label for="idPlayer">Gift Name:</label>
+            {{ form.idPlayer(class="form-control idPlayer-input") }}
+
+            <label for="giftId">Ratio</label>
+            {{ form.giftId(class="form-control giftId-input") }}
+
+            <label for="amount">Amount</label>
+            {{ form.amount(class="form-control amount-input") }}
+
+            <label for="state">State</label>
+            {{ form.state(class="form-control state-input") }}
+            <label for="state">Game Id</label>
+            {{ form.state(class="form-control state-input") }}
+
+            <button type="submit" class="btn btn-primary add-winner">Add Gift</button>
+        </form>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Gift Id</th>
+                    <th>giftName</th>
+                    <th>ratio</th>
+                    <th>Amount</th>
+                    <th>State</th>
+                    <th>GameId</th>
+                </tr>
+            </thead>
+            <tbody class="winners-list">
+                {% for winner in winners %}
+                    <tr>
+                        <td>{{ winner.WinId }}</td>
+                        <td>{{ winner.IdPlayer }}</td>
+                        <td>{{ winner.GiftId }}</td>
+                        <td>{{ winner.Amount }}</td>
+                        <td>{{ winner.State }}</td>
+                        <td>
+                            <button class="btn btn-warning edit-winner" data-win-id="{{ winner.WinId }}">Edit</button>
+                            <button class="btn btn-danger delete-winner" data-win-id="{{ winner.WinId }}">Delete</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+    <script src="{{ url_for('static', filename='public_link_game.js') }}"></script>
+    <script src="{{ url_for('static', filename='winners.js') }}"></script>
+</body>
+
+</html>
